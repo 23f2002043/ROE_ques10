@@ -3,6 +3,7 @@ import pandas as pd
 import pdfplumber
 from fastapi import FastAPI, File, UploadFile, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import JSONResponse
 
 # Initialize the FastAPI application
 app = FastAPI(
@@ -10,7 +11,9 @@ app = FastAPI(
     description="An API to analyze PDF invoices and calculate spending."
 )
 
-
+# --- Enable CORS for all origins ---
+# This is a security requirement to allow browsers from any domain
+# to make requests to this API.
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],  # Allows all origins
@@ -70,7 +73,7 @@ async def analyze_invoice(file: UploadFile = File(..., description="The PDF invo
         total_sum = contraption_df['Total'].sum()
 
         # --- 5. Return the result in the specified JSON format ---
-        return {"sum": total_sum}
+        return JSONResponse(content={"sum": total_sum})
 
     except Exception as e:
         # Catch-all for any other processing errors
